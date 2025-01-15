@@ -1,12 +1,64 @@
-const express=require("express");
-const app=express();
-const port=4700;
+const express = require("express");
+const app = express();
+const port = 4700;
+const mysql = require('mysql2');
 
-app.get("/",(req,res)=>{
-    res.send("Hello peeps");
+// Create MySQL connection
+const db = mysql.createConnection({
+  user: "root",
+  host: "mysql", // Docker service name as host
+  password: "sachin",
+  database: "test_db"
+});
 
-    })
+// Connect to the database
+db.connect((err) => {
+  if (err) {
+    console.log("Cannot connect to the database:", err);
+    return; // Exit if there's an error
+  } else {
+    console.log("Database connected successfully");
 
-app.listen(port,()=>{
-    console.log("post is running on 4700")
-})    
+    // Create table query
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS test_table (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(200)
+      )
+    `;
+
+    // Execute the query to create the table if it doesn't exist
+    db.query(createTableQuery, (error, result) => {
+      if (error) {
+        console.error("Error creating table:", error);
+      } else {
+        console.log("Table created successfully or already exists");
+      }
+    });
+  }
+});
+
+app.use(express.json());  // Use middleware to parse JSON bodies
+
+// Simple get route
+app.get("/", (req, res) => {
+  res.send("Hello from the backend!");
+});
+
+// POST route to insert data into test_table
+app.post("/", (req, res) => {
+  const sql = "INSERT INTO test_table (name) VALUES ('modi')";
+  db.query(sql, (error, results) => {
+    if (error) {
+      console.error("Error inserting values:", error);
+      res.status(500).send("Error inserting values");
+    } else {
+      console.log("Inserted data successfully");
+      res.send("Data inserted successfully");
+    }
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
