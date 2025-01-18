@@ -26,6 +26,7 @@ db.connect((err) => {
         name VARCHAR(200)
       )
     `;
+ 
 
     // Execute the query to create the table if it doesn't exist
     db.query(createTableQuery, (error, result) => {
@@ -33,6 +34,16 @@ db.connect((err) => {
         console.error("Error creating table:", error);
       } else {
         console.log("Table created successfully or already exists");
+      }
+    });
+    const sql2="INSERT INTO test_table (name) VALUES ('msdhoni kumar')";
+    db.query(sql2, (error, results) => {
+      if (error) {
+        console.error("Error inserting values:", error);
+       
+      } else {
+        console.log("Inserted data successfully");
+   
       }
     });
   }
@@ -46,18 +57,7 @@ app.get("/", (req, res) => {
 });
 
 // POST route to insert data into test_table
-app.post("/", (req, res) => {
-  const sql = "INSERT INTO test_table (name) VALUES ('modi')";
-  db.query(sql, (error, results) => {
-    if (error) {
-      console.error("Error inserting values:", error);
-      res.status(500).send("Error inserting values");
-    } else {
-      console.log("Inserted data successfully");
-      res.send("Data inserted successfully");
-    }
-  });
-});
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
